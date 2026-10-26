@@ -1,40 +1,41 @@
 
+import csv
+import json
 from pathlib import Path
 
-def count_lines(filename):
-    with open(filename, "r", encoding="utf-8") as file:
-        return sum(1 for line in file)
 
+def csv_to_json(csv_file, json_file):
+    data = []
 
-def extract_first_two_lines(filename):
-    with open(filename, "r", encoding="utf-8") as file:
-        return [next(file, "") for _ in range(2)]
+    # Read data from CSV file
+    with open(csv_file, "r", newline="", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
 
+        for row in reader:
+            data.append(row)
 
-def write_to_file(filename, lines):
-    with open(filename, "w", encoding="utf-8") as file:
-        file.writelines(lines)
+    # Write data to JSON file
+    with open(json_file, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
+
+    return len(data)
 
 
 # Main Program
-input_file = Path(__file__).parent / "input.txt"
-output_file = Path(__file__).parent / "output.txt"
+folder = Path(__file__).parent
+input_file = folder / "students.csv"
+output_file = folder / "students.json"
 
 try:
-    total_lines = count_lines(input_file)
-    print("Total number of lines:", total_lines)
+    total_students = csv_to_json(input_file, output_file)
 
-    first_two_lines = extract_first_two_lines(input_file)
-
-    print("\nFirst two lines:")
-    for line in first_two_lines:
-        print(line.rstrip("\n"))
-
-    write_to_file(output_file, first_two_lines)
-
-    print("\nFirst two lines have been written to output.txt")
+    print("CSV file converted to JSON successfully.")
+    print("Total records converted:", total_students)
+    print("JSON data written to:", output_file.name)
 
 except FileNotFoundError:
-    print("Error: input.txt was not found.")
+    print("Error: students.csv was not found.")
+    print("Please create students.csv in the same folder as main.py.")
+
 except OSError as error:
     print("File error:", error)
